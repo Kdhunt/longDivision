@@ -1,0 +1,146 @@
+<!Doctype html>
+<html>
+<head>
+<title></title>
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+ <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+
+  <style>
+
+	.partialWrapper{width:230px; border:1px solid #000; padding:4px;}
+	.partialWrapper, .workspace {display:inline-block; min-height:300px;}
+	.workspace {width:315px; font-size:40px; margin:20px;}
+	.product {width: 100%; color:red; margin-right:10px }
+	.product, .numerator, .denominator {height:50px; max-height: 50px; text-align:right;}
+	.product.correct {color:green;}
+	.numerator {width:200px; display:inline-block; 
+		border-top: 2px solid black;
+		border-left: 2px solid black;
+		border-right: 2px solid black;
+		
+	}
+	.denominator {width:100px; display:inline-block;}
+	.calculations {min-height:100px; width:312px; border-right: 2px solid black;}
+	.calculations .calc{font-align:right;}
+	.partial{
+		font-size:14px;
+		background-color: #00FFCC;
+		height:22px;
+		padding:2px;
+		border-radius:5px;
+		margin:2px 0px;
+		border: 1px dotted: #cccccc;
+	}
+	.partial .show-product{ font-size:18px; color: blue;}
+	.partial .show-multiple{font-size:18px; color: green;}
+	.origin{float:right;}
+	.destination{float:left;}
+	.workspace{margin: 0px 10px 0px 10px;}
+	.calculations .calc{border-bottom:1px solid black;}
+	.calculations div{ text-align:right;}
+ </style>
+ <script type="text/javascript">
+	var currentVal = $(".currentValue").val();
+	 function PartialProduct(){
+		return {
+			base:"",
+			multiplier:"",
+			unit:"", 
+			product:"",
+			mathString:"" 
+		}; 
+	}
+   partial = new PartialProduct();
+   
+$(function() {
+	
+	var numerator = $(".js-numerator");
+	var denominator = $(".js-denominator");
+	var product = $(".js-product");
+	newProblem();
+	$( ".destination" ).droppable({
+		drop: function( event, ui ) {
+			if(ui.draggable.data("product") > currentVal){return;}
+			currentVal = addPartial(ui.draggable.data("product"), currentVal);
+			
+			ui.draggable.clone().appendTo( this );
+			product.text(updateProduct());
+		},
+		accept: ".partial"
+	});
+});
+function addPartial(value, currentVal){
+	var newVal = currentVal - value;
+	$(".js-calulations").append("<div class='calc'>-"+value+"</div><div class='newProduct'>"+newVal+"</div>");
+	
+	return newVal;
+};
+function updateProduct(){
+	var product = 0;
+	 $.each($('.destination .partial'), function() {
+       product += $( this ).data("multiplier");
+     });
+	 return product;
+}
+function newPartials(denominator){
+	$(".origin").empty();
+	multipliers = [1,2,3,4,5,6,7,8,9,10,11,12,20,30,40,50,100];
+	$.each(multipliers, function(i,m) {
+		var d = denominator;
+		var p = m*d;
+    $(".origin").append("	<div data-product='"+p+"' data-base='"+d+"'	data-multiplier='"+m+"' data-math='"+d+"x"+m+"="+p+"' class=\"partial\"><span class=\"show-product\">"+p+"</span> | #"+d+"'s: <span class=\"show-multiple\">"+m+"</span> | "+d+"x"+m+"="+p+"</div>");
+		
+    });
+}
+function newProblem(){
+	var num = Math.floor((Math.random() * 100) + 1);
+	var den = Math.floor((Math.random() * 100) + 1);
+	var prod = num*den;
+	currentVal = prod;
+	$(".js-numerator").text(prod);
+	$(".js-denominator").text(den);
+	$(".destination").empty();
+	updateProduct();
+	newPartials(den);
+	makeDraggable();
+}
+function makeDraggable(){
+	$( ".partial" ).draggable({
+		cancel: "a", // clicking an icon won't initiate dragging
+		revert: "invalid", // when not dropped, the item will revert back to its initial position
+		containment: "body",
+		helper: "clone",
+		cursor: "move"
+	});
+}
+ </script>
+</head>
+<body>
+<div class="js-division">
+	<input type="hidden" class="currentValue" value="154">
+	<div class="js-using-partials partialWrapper destination">
+		Drop partials here.
+	</div>
+	<div class="js-workspace workspace">
+		<div class="js-product product"></div>
+		<div class="js-denominator denominator">7</div>
+		<div class="js-numerator numerator">154</div>
+		<div class="js-calulations calculations"></div>
+
+	</div>
+	<div class="js-list-partials partialWrapper origin">
+		<div data-product="7" data-base="7" data-unit="1" data-multiplier="1" data-math="7x1=7" class="partial"><span class="show-product">7</span> |#7's:: 1 | 7x1=7</div>
+		<div data-product="14" data-base="7" data-unit="1" data-multiplier="2" data-math="7x2=7" class="partial"><span class="show-product">14</span> | #7's:: 2 | 7x2=14</div>
+		<div data-product="21" data-base="7" data-unit="1" data-multiplier="3" data-math="7x3=7" class="partial"><span class="show-product">21</span> | #7's:: 3 | 7x3=21</div>
+		<div data-product="28" data-base="7" data-unit="1" data-multiplier="4" data-math="7x4=7" class="partial"><span class="show-product">28</span> | #7's:: 4 | 7x4=28</div>
+		<div data-product="35" data-base="7" data-unit="1" data-multiplier="5" data-math="7x5=7" class="partial"><span class="show-product">35</span> | #7's:: 5 | 7x5=35</div>
+		<div data-product="42" data-base="7" data-unit="1" data-multiplier="6" data-math="7x6=7" class="partial"><span class="show-product">42</span> | #7's:: 6 | 7x6=42</div>
+		<div data-product="49" data-base="7" data-unit="1" data-multiplier="7" data-math="7x7=7" class="partial"><span class="show-product">49</span> | #7's:: 7 | 7x7=49</div>
+		<div data-product="56" data-base="7" data-unit="1" data-multiplier="8" data-math="7x8=7" class="partial"><span class="show-product">56</span> | #7's:: 8 | 7x8=56</div>
+		<div data-product="63" data-base="7" data-unit="1" data-multiplier="9" data-math="7x9=7" class="partial"><span class="show-product">63</span> | #7's:: 9 | 7x9=63</div>
+		<div data-product="70" data-base="7" data-unit="10" data-multiplier="10" data-math="7x10=70" class="partial"><span class="show-product">70</span> | #7's: 10 | 7x10=70</div>
+		
+	</div>
+</div>
+</body>
+</html>
